@@ -1,0 +1,21 @@
+{
+  "name": "aixjs-20170222-promise",
+  "authors": [
+    "Jean-Baptiste Demonte <jbdemonte@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendors/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "reveal.js": "^3.4.1"
+  }
+}

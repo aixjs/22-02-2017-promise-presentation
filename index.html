@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Aix-JS - 2017/02/22 - Promise Party</title>
+
+		<meta name="description" content="An introduction to Promise">
+		<meta name="author" content="Jean-Baptiste Demonte">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="vendors/reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="vendors/reveal.js/css/theme/black.css" id="theme">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="vendors/reveal.js/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'vendors/reveal.js/css/print/pdf.css' : 'vendors/reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="vendors/reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+        <style>
+            section img {
+              border: none !important;
+              background: none !important;
+            }
+            a.source {
+              font-size: 14px;
+            }
+        </style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Promise Party</h1>
+					<h3>From Hell to Heaven (or near)</h3>
+					<p>
+						<small>
+                            <a href="http://jb.demonte.fr">Jean-Baptiste Demonte</a>
+                            <br />
+                            <a href="http://twitter.com/jbdemonte">jbdemonte@twitter</a> /
+                            <a href="https://github.com/jbdemonte">jbdemonte@github</a>
+                        </small>
+					</p>
+				</section>
+
+				<section>
+					<h2>JavaScript Asynchrone</h2>
+                    <h3>Back (node)</h3>
+					<pre><code class="hljs" data-trim contenteditable>
+fs.readFile(fichierA, function (err, contenuA) {
+  if (err) {
+    return console.log('FAIL: ' + err.message);
+  }
+  ...
+});
+					</code></pre>
+                    <h3>Front (jQuery)</h3>
+					<pre><code class="hljs" data-trim contenteditable>
+$.post('send.php',
+  {
+    name: 'Jean-Michel', email: 'jeanmich@caramail.com'
+  },
+  function (data) {
+    ...
+  }
+);
+					</code></pre>
+
+					<aside class="notes">
+						voir la répartition débutant / experimenté, sync / async
+					</aside>
+				</section>
+
+				<section>
+					<h3>L'enfer de la programation asynchrone</h3>
+					<a href="https://github.com/bitwarden/browser/issues/35">
+						<img data-src="assets/callback-hell.png" style="max-height: 450px">
+
+						<aside class="notes"></aside>
+					</a>
+				</section>
+
+				<section data-background-image="assets/a-new-hope.jpg">
+                    <aside class="notes">
+                        C'est la qu'interviennent les promises, elles vont nous permettent d'apporte un peu de clarté au code
+                    </aside>
+                </section>
+
+				<section>
+                    <ul>
+                        <li style="margin-bottom:100px">
+                            Le terme générique de promise (« promesse ») a été proposé par Daniel P. Friedman et David Wise en 1976. (<a href="https://fr.wikipedia.org/wiki/Futures_(informatique)">wikipedia</a>)
+                            <br />
+                            <span style="font-size:30px; color: gray; display: block; text-align: right"><q>A new Hope</q> sortait un an plus tard, de la à y voir uu</span>
+                        </li>
+                        <li>
+                            Une promesse représente une valeur qui peut être disponible maintenant, dans le futur voire jamais. (<a href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Promise">MDN</a>)
+                        </li>
+                    </ul>
+
+                    <aside class="notes"></aside>
+				</section>
+
+				<section>
+					<h2>La promesse de JavaScript</h2>
+                    <h3>Avant ES6</h3>
+
+
+                    <ul><li> <a href="http://wiki.commonjs.org/wiki/Promises/A" title="Promises/A">Promises/A</a> by Kris Zyp — "Thenables"</li>
+                        <li> <a href="http://wiki.commonjs.org/wiki/Promises/B" title="Promises/B">Promises/B</a> by Kris Kowal — Opaque Q API</li>
+                        <li> <a href="http://wiki.commonjs.org/wiki/Promises/KISS" title="Promises/KISS">Promises/KISS</a> by AJ ONeal</li>
+                        <li> Promises/C has been redacted</li>
+                        <li> <a href="http://wiki.commonjs.org/wiki/Promises/D" title="Promises/D">Promises/D</a> by Kris Kowal — "Promise-sendables", for interoperable instances of <a href="http://wiki.commonjs.org/wiki/Promises/B" title="Promises/B">Promises/B</a>.</li>
+                    </ul>
+
+                    <aside class="notes">
+                    </aside>
+				</section>
+
+                <section data-background-image="assets/One-Ring-to-Rule-them-All.jpg">
+                    <h1 style="text-shadow: 4px 4px 2px rgba(0, 0, 0, 1);">Promises/A+</h1>
+                    <aside class="notes">
+                        Promises/A+
+                    </aside>
+                </section>
+
+				<section>
+					<h2>La promesse de JavaScript</h2>
+                    <h3>Avant ES6</h3>
+
+                    <ul>
+                        <li>Des librairies émergent:
+                            <ul>
+                                <li><a href="http://documentup.com/kriskowal/q/">Q</a></li>
+                                <li><a href="http://bluebirdjs.com/docs/getting-started.html">bluebird</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            Un framework, une lib => une pattern de Promise:
+                            <ul>
+                                <li>
+                                    <a href="http://api.jquery.com/category/deferred-object/">jQuery</a> basée sur CommonJS Promise/A
+                                </li>
+                                <li>
+                                    <a href="http://docs.angularjs.org/api/ng.$q">AngularJS</a> $q (basé sur <a href="http://documentup.com/kriskowal/q/">Q</a>)
+                                </li>
+                                <li>
+                                    <a href="http://mongoosejs.com/">Mongoose</a> utilise des <a href="https://www.npmjs.com/package/mpromise">mpromise</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <aside class="notes">
+                        ES6 => Promise = natif
+                    </aside>
+				</section>
+
+				<section>
+					<h2>L'object Promise</h2>
+
+					<pre><code class="hljs" data-trim contenteditable>
+var p = new Promise(function (resolve, reject) {
+  ...
+  if (err) {
+    reject(err);
+  } else {
+    resolve(value);
+  }
+});
+					</code></pre>
+
+                    <p>Les états d'une promesse:</p>
+                    <ul>
+                        <li>fulfilled - resolve appelé</li>
+                        <li>rejected - reject appelé</li>
+                        <li>pending - ni fulfilled, ni rejected</li>
+                        <li>(settled - fulfilled ou rejected)</li>
+                    </ul>
+
+                    <aside class="notes">
+                        Exécution immédiate
+                        <br />
+                        Reject => reason
+                        <br />
+                        Resolve => value
+                    </aside>
+				</section>
+
+				<section>
+					<h2>Exemple coté Front</h2>
+
+					<pre><code class="hljs" data-trim contenteditable style="font-size:20px; line-height: 20px">
+function get(url) {
+  return new Promise(function (resolve, reject) {
+    var req = new XMLHttpRequest();
+    req.open('GET', url);
+
+    req.onload = function () {
+      if (req.status == 200) {
+        resolve(req.response);
+      } else {
+        reject(new Error(req.statusText));
+      }
+    };
+
+    req.onerror = function () {
+      reject(new Error("Network Error"));
+    };
+
+    req.send();
+  });
+}
+					</code></pre>
+
+                    <aside class="notes"></aside>
+				</section>
+
+				<section>
+					<h2>Exemple coté Back</h2>
+
+					<pre><code class="hljs" data-trim contenteditable>
+function readFile(file, options) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(file, options, function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+					</code></pre>
+
+                    <aside class="notes"></aside>
+				</section>
+
+				<section>
+                    <img data-src="assets/so-what.png">
+                    <aside class="notes">
+                        Ca semble plus lourd à écrire...<br />
+                        Mais la simplication vient de l'utilisation de ces fonctions.
+                    </aside>
+				</section>
+
+                <section>
+                    <h2>Promise/A+ aka <q>thenable</q></h2>
+
+                    <h3>Création d'un promesse</h3>
+                    <pre><code class="hljs" data-trim contenteditable>
+                        new Promise(executor)
+                        Promise.all(iterable)
+                        Promise.reject(reason)
+                        Promise.resolve(value)
+                    </code></pre>
+
+                    <h3>Chainage de la promesse</h3>
+                    <pre><code class="hljs" data-trim contenteditable>
+                        Promise.prototype.then(onFulfilled, onRejected)
+                        Promise.prototype.catch(onRejected)
+                    </code></pre>
+                    <aside class="notes">
+                        catch est un shortcut de then(null, onRejected) <br />
+                        catch renvoi une promesse qui est chainage sur un then<br />
+                    </aside>
+                </section>
+
+                <section>
+                    <pre><code class="hljs" data-trim contenteditable style="font-size:20px; line-height: 20px; max-height: 600px">
+  get(url) // Promise.resolve(data)
+    .then(function (content) {
+      return content.length;
+    })
+    .then(function (len) {
+      return get(url2);
+    })
+    .catch(function (err) {
+      result.error = err;
+      res.json(result);
+    })
+    .then(function () {
+      // ...
+    })
+    .then(function () {
+      // ...
+    })
+    .then(function () {
+      return Promise.all([get(url3), get(url4), get(url5)]);
+    })
+    .then(function (value) {
+      // value[0] => content url 3
+      // value[1] => content url 4
+      // value[2] => content url 5
+    })
+    .catch(function (err) {
+      result.error = err;
+      res.json(result);
+    })
+					</code></pre>
+
+                    <aside class="notes">
+                        Promise.all result conserve l'ordre
+                    </aside>
+                </section>
+
+                <section>
+                    <h2>Exemple d'utilisation</h2>
+
+                    <pre><code class="hljs" data-trim contenteditable style="font-size:20px; line-height: 20px">
+
+  var result = {games: []};
+  tools.fs
+    .readdir(system.path.roms)
+    .then(function (files) {
+      result.games = files;
+    })
+    .then(function () {
+      return tools.source.list();
+    })
+    .then(function (sources) {
+      result.downloadable = sources.some(function (source) {
+        return source.hasSystem(system);
+      });
+    })
+    .then(function () {
+      res.json(result);
+    })
+    .catch(function (err) {
+      result.error = err;
+      res.json(result);
+    });
+					</code></pre>
+                    <a href="https://github.com/jbdemonte/Retro-Manager/blob/master/server/api/system/:systemId/get.js#L9" class="source">source</a>
+
+                    <aside class="notes"></aside>
+                </section>
+
+                <section>
+                    <h2>L'anti-pattern Deferred </h2>
+
+                    <pre><code class="hljs" data-trim contenteditable style="font-size:20px; line-height: 20px">
+function asyncGreet(name) {
+  var deferred = $q.defer();
+
+  setTimeout(function() {
+    deferred.notify('About to greet ' + name + '.');
+
+    if (okToGreet(name)) {
+      deferred.resolve('Hello, ' + name + '!');
+    } else {
+      deferred.reject('Greeting ' + name + ' is not allowed.');
+    }
+  }, 1000);
+
+  return deferred.promise;
+}
+					</code></pre>
+
+                    <aside class="notes">
+                        La plus classique <br />
+                        Try / Catch
+                    </aside>
+                </section>
+
+                <section>
+                    <h2>ES 6</h2>
+
+                    <p>L'object Promise est natif sur node depuis la 0.12</p>
+                    <img data-src="assets/caniuse.png">
+                    <p style="color: red; font-size: 12px; background: white; text-align: left; padding: 10px">DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is deprecated, plug in your own promise library instead: http://mongoosejs.com/docs/promises.html</p>
+
+                    <aside class="notes">
+                        Node 0.12 mais, on recommande d'utiliser bluebird a cause de fuite mémoires <br />
+                        Toutes les librairies deprecie petit à petit <br />
+                        Parler du chainage de "Promise" de differentes lib / formats
+                    </aside>
+                </section>
+
+                <section>
+                    <h2>ES 7</h2>
+
+                    <pre><code class="hljs" data-trim contenteditable>
+  async function doAsyncOp () {
+    var val = await asynchronousOperation();
+    val = await asynchronousOperation(val);
+    return await asynchronousOperation(val);
+  };
+                    </code></pre>
+
+                    <aside class="notes">
+                    </aside>
+                </section>
+
+                <section>
+                    <img data-src="assets/any-questions.gif">
+                </section>
+
+			</div>
+
+		</div>
+
+		<script src="vendors/reveal.js/lib/js/head.min.js"></script>
+		<script src="vendors/reveal.js/js/reveal.js"></script>
+
+		<script>
+
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				dependencies: [
+					{ src: 'vendors/reveal.js/lib/js/classList.js', condition: function () { return !document.body.classList; } },
+					{ src: 'vendors/reveal.js/plugin/markdown/marked.js', condition: function () { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'vendors/reveal.js/plugin/markdown/markdown.js', condition: function () { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'vendors/reveal.js/plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+					{ src: 'vendors/reveal.js/plugin/zoom-js/zoom.js', async: true },
+					{ src: 'vendors/reveal.js/plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
